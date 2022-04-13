@@ -1,6 +1,8 @@
 defmodule MiniSpider.Storage.Mem do
   @behaviour MiniSpider.Storage
 
+  @type store_opt :: {:ets_table, :ets.tab()}
+
   @impl MiniSpider.Storage
   def store(uri, content, opts) do
     with(

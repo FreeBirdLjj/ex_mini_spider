@@ -1,5 +1,5 @@
 defmodule MiniSpider.Crawler do
-  @spec crawl(String.t(), non_neg_integer(), module(), keyword()) ::
+  @spec crawl(String.t(), :timer.time(), module(), keyword()) ::
           {:error, term()} | {:ok, Oban.Job.t()}
   def crawl(url, interval, storage_engine, storage_opts \\ []) do
     MiniSpider.Crawler.Worker.enqueue(

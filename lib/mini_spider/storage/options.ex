@@ -10,7 +10,8 @@ defmodule MiniSpider.Storage.Options do
     ) do
       {:ok, value}
     else
-      _ -> {:error, ArgumentError.exception("The type of option `#{key}` should be #{type_name}.")}
+      _ ->
+        {:error, ArgumentError.exception("The type of option `#{key}` should be #{type_name}.")}
     end
   end
 end

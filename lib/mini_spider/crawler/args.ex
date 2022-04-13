@@ -18,7 +18,7 @@ defmodule MiniSpider.Crawler.Args do
     |> validate_storage_params()
   end
 
-  @spec validate_storage_params(term()) ::
+  @spec validate_storage_params(map()) ::
           {:ok, %{engine: module(), opts: keyword()}} | {:error, term()}
   def validate_storage_params(params) do
     with(

@@ -22,16 +22,17 @@ defmodule MiniSpider.Crawler.Worker do
         attempted_at: attempted_at
       }) do
     with(
-      {:ok, storage} <- MiniSpider.Crawler.Args.decode_storage_params(storage),
-      %{engine: storage_engine, opts: storage_opts} <- storage,
+      {:ok, %{engine: storage_engine, opts: storage_opts}} <-
+        MiniSpider.Crawler.Args.decode_storage_params(storage),
       {:ok, resp} <- crawl(url),
       :ok <- skip_non_html_url(url, resp.headers),
       {:ok, uri} <- URI.new(url),
       :ok <- storage_engine.store(uri, resp.body, storage_opts),
+      {:ok, decendent_urls} <- MiniSpider.HTML.get_decendent_urls(resp.body),
+      inner_urls = filter_inner_urls(uri, decendent_urls),
       :ok <-
         enqueue_decendent_jobs(
-          uri,
-          resp.body,
+          inner_urls,
           attempted_at,
           interval,
           storage_engine,
@@ -78,12 +79,21 @@ defmodule MiniSpider.Crawler.Worker do
     end
   end
 
-  defp enqueue_decendent_jobs(uri, content, attempted_at, interval, storage_engine, storage_opts) do
+  defp filter_inner_urls(uri, urls) do
+    urls
+    |> Enum.map(&URI.merge(uri, &1))
+    |> Enum.filter(&(&1.host == uri.host))
+  end
+
+  defp enqueue_decendent_jobs(
+         decendent_urls,
+         attempted_at,
+         interval,
+         storage_engine,
+         storage_opts
+       ) do
     errs =
-      content
-      |> MiniSpider.HTML.get_decendent_urls()
-      |> Enum.map(&URI.merge(uri, &1))
-      |> Enum.filter(&(&1.host == uri.host))
+      decendent_urls
       |> Enum.map(
         &enqueue(
           URI.to_string(&1),
@@ -94,7 +104,7 @@ defmodule MiniSpider.Crawler.Worker do
       )
       |> Keyword.delete(:ok)
 
-    if errs == [] do
+    if Enum.empty?(errs) do
       :ok
     else
       {:error, {:enqueue_decendent_jobs, errs}}
