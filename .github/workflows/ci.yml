@@ -8,6 +8,19 @@ permissions:
   contents: read
 
 jobs:
+  format:
+
+    name: format
+    runs-on: ubuntu-latest
+
+    container:
+      image: elixir:latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Format
+      run: mix format --check-formatted
+
   unit-test:
 
     name: unit test
@@ -33,11 +46,15 @@ jobs:
     - name: Restore dependencies cache
       uses: actions/cache@v3
       with:
-        path: deps
+        path: |
+          deps
+          priv/plts
         key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
         restore-keys: ${{ runner.os }}-mix-
     - name: Install dependencies
-      run: mix deps.get
+      run: mix deps.get --only test
+    - name: Lint
+      run: mix dialyzer
     - name: Run tests
       env:
         MIX_ENV: test

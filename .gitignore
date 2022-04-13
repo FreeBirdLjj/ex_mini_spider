@@ -26,3 +26,7 @@ mini_spider-*.tar
 /tmp/
 
 .*.~undo-tree~
+
+# Dialyxir PLT
+/priv/plts/*.plt
+/priv/plts/*.plt.hash

@@ -8,7 +8,10 @@ defmodule MiniSpider.MixProject do
       elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      dialyzer: [
+        plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+      ]
     ]
   end
 
@@ -28,6 +31,7 @@ defmodule MiniSpider.MixProject do
     [
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:fake_server, "~> 2.1", only: :test},
       {:finch, "~> 0.11"},
       {:floki, "~> 0.32.0"},
