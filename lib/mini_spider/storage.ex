@@ -1,3 +1,3 @@
 defmodule MiniSpider.Storage do
-  @callback store(URI.t(), String.t(), keyword()) :: :ok | {:error, term}
+  @callback store(url :: URI.t(), content :: String.t(), opts :: keyword()) :: :ok | {:error, term}
 end
